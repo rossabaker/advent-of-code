@@ -3,13 +3,12 @@ module Day03 where
 newtype Grid = Grid {unGrid :: [[Char]]}
 
 answer1 :: IO Int
-answer1 = bonks (3, 1) <$> readGrid
+answer1 = flip bonks (3, 1) <$> readGrid
 
 answer2 :: IO Int
 answer2 =
-  product . bonks' slopes <$> readGrid
+  product . flip (fmap . bonks) slopes <$> readGrid
   where
-    bonks' = flip ((<$>) . flip bonks)
     slopes = [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)]
 
 width :: Grid -> Int
@@ -27,8 +26,8 @@ isTree grid (x, y) =
 path :: Int -> Int -> [(Int, Int)]
 path x y = zip [0, x ..] [0, y ..]
 
-bonks :: (Int, Int) -> Grid -> Int
-bonks (x, y) grid =
+bonks :: Grid -> (Int, Int) -> Int
+bonks grid (x, y) =
   length $ filter (isTree grid) path'
   where
     path' = takeWhile ((< height grid) . snd) $ path x y
